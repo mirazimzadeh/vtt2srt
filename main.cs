@@ -15,12 +15,23 @@ namespace Mironline.vtt2srt
                     File.ReadAllText(file, Encoding.UTF8)
                         .Split(new[] {"\n\n"}, StringSplitOptions.None)
                         .Where(o => o != @"WEBVTT")
-                        .Select((c, i) => new
-                        {
-                            content = (i+1) + Environment.NewLine + c + Environment.NewLine
+                        .Select((c, i) => new {
+                            content = CorrectFormat(i,c)
                         }).Select(o => o.content).ToArray()
                 );
             }
+        }
+
+        static string CorrectFormat(int index , string lineString)
+        {
+            var lines = lineString.Split('\n');
+            
+            var times = lines[0].Split(new[] {"-->"}, StringSplitOptions.None);
+
+            return (index+1)  
+                      + Environment.NewLine + ("00:" + times[0].Trim() + " --> " + "00:" + times[1].Trim()).Replace(".", ",")
+                      + Environment.NewLine + lines[1] + Environment.NewLine;
+                ;
         }
     }
 }
